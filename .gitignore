@@ -9,3 +9,4 @@ __pycache__/
 stats.json.tmp
 .cache/
 creds/
+mockups/

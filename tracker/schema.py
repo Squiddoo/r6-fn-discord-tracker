@@ -27,7 +27,7 @@ R6_FIELDS: dict[str, int | float | str] = {
     "time_played_hours": 0,
 }
 
-FN_FIELDS: dict[str, int | float] = {
+FN_FIELDS: dict[str, int | float | str] = {
     "wins": 0,
     "kills": 0,
     "matches": 0,
@@ -36,6 +36,8 @@ FN_FIELDS: dict[str, int | float] = {
     "duo_wins": 0,
     "squad_wins": 0,
     "battle_pass_level": 0,
+    "br_rank": "Unranked",
+    "reload_rank": "Unranked",
 }
 
 R6_KEYS = ("player_1_r6", "player_2_r6", "player_3_r6")
@@ -72,6 +74,8 @@ FN_LABELS = {
     "duo_wins": "Duo Wins",
     "squad_wins": "Squad Wins",
     "battle_pass_level": "Battle Pass Level",
+    "br_rank": "BR Rank",
+    "reload_rank": "Reload Rank",
 }
 
 
