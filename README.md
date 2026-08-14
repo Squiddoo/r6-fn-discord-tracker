@@ -6,7 +6,7 @@ This repo is a template. Fork it, add your own secrets, run the workflow once, t
 
 | | |
 |---|---|
-| Schedule | every 15 minutes (`*/15 * * * *`) |
+| Schedule | every 15 minutes (external ping; GitHub cron is only a fallback) |
 | Players | 3 Siege + 3 Fortnite |
 | Discord | one embed per player who actually changed; **no pings** |
 | Privacy | usernames and keys stay in GitHub Secrets; `stats.json` is anonymous |
@@ -75,6 +75,28 @@ The first successful fetch is a **silent baseline** (no Discord spam from `0 →
 
 Scheduled workflows stay off on a brand-new public repo until that first manual run.
 
+### 6. Make the 15-minute check actually on time (one-time)
+
+GitHub's own cron on a **public** repo is often 1–2 hours late. Discord still posts in the same run as soon as a stat changes — the check just does not start on time.
+
+Keep using GitHub Actions as the host. Add a free [cron-job.org](https://cron-job.org) job that presses **Run workflow** every 15 minutes:
+
+1. Create a [fine-grained PAT](https://github.com/settings/personal-access-tokens/new): only this repo, permission **Actions: Read and write**, expiration 1 year. Copy it once. Do not commit it.
+2. On [cron-job.org](https://cron-job.org) → Create cronjob:
+   - Title: `r6-fn tracker`
+   - Address: `https://api.github.com/repos/Squiddoo/r6-fn-discord-tracker/actions/workflows/workflow.yml/dispatches`
+   - Schedule: every 15 minutes
+   - Request method: `POST`
+   - Headers:
+     - `Accept: application/vnd.github+json`
+     - `Authorization: Bearer <paste-the-PAT>`
+     - `X-GitHub-Api-Version: 2022-11-28`
+     - `Content-Type: application/json`
+   - Body: `{"ref":"main"}`
+3. Click **Test run**. You should see a new run under **Actions** within a few seconds.
+
+After that you can leave it. Renew the PAT when it expires.
+
 ---
 
 ## What gets posted
@@ -82,7 +104,7 @@ Scheduled workflows stay off on a brand-new public repo until that first manual 
 One Discord embed per player who changed:
 
 - **Siege:** ranked / casual / overall (rank, RP, kills, deaths, wins, K/D, level, hours)
-- **Fortnite:** career wins, eliminations, matches, K/D, Solo/Duo/Squad wins, Battle Pass level
+- **Fortnite:** this-season **BR rank** and **Reload rank**, career wins, eliminations, matches, K/D, Solo/Duo/Squad wins, Battle Pass level
 
 `stats.json` is overwritten each run. It is not a history log.
 
@@ -125,7 +147,8 @@ Someone who clones this gets empty placeholders. Running it without *their own* 
 
 | Symptom | Likely cause |
 |---|---|
-| Workflow never runs on a schedule | Run **Track player stats** once by hand |
+| Workflow never runs on a schedule | Run **Track player stats** once by hand, then add the cron-job.org ping in step 6 |
+| Checks are hours late | GitHub public cron delay — use the cron-job.org ping in step 6 |
 | `Missing required environment variable` | A secret name does not match `.env.example` |
 | Siege 429 / Ubisoft rate limit | Normal on GitHub IPs — set `ARENYZE_API_KEY` |
 | Fortnite 403 / 404 | Stats are private, or the display name / account type is wrong |

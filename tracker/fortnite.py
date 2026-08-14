@@ -5,6 +5,7 @@ from typing import Any
 import fortnite_api
 
 from tracker.config import FNPlayer
+from tracker.fn_ranks import fetch_season_ranks
 from tracker.schema import FN_FIELDS
 
 _ACCOUNT_TYPES = {
@@ -74,7 +75,12 @@ async def fetch_fn_player(
                 type=account_type,
                 time_window=fortnite_api.TimeWindow.LIFETIME,
             )
-            return _parse_stats(stats), name
+            parsed = _parse_stats(stats)
+            try:
+                parsed.update(await fetch_season_ranks(name))
+            except Exception as exc:
+                print(f"::warning::{player.key} season ranks skipped: {type(exc).__name__}: {exc}")
+            return parsed, name
         except (fortnite_api.NotFound, fortnite_api.Forbidden) as exc:
             last_error = exc
             continue
