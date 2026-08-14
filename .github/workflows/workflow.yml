@@ -1,0 +1,65 @@
+name: Track player stats
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: stats-tracker
+  cancel-in-progress: false
+
+jobs:
+  track:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Fetch stats, notify, overwrite snapshot
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          FORTNITE_API_KEY: ${{ secrets.FORTNITE_API_KEY }}
+          UBISOFT_EMAIL: ${{ secrets.UBISOFT_EMAIL }}
+          UBISOFT_PASSWORD: ${{ secrets.UBISOFT_PASSWORD }}
+          ARENYZE_API_KEY: ${{ secrets.ARENYZE_API_KEY }}
+          R6_PLAYER_1_NAME: ${{ secrets.R6_PLAYER_1_NAME }}
+          R6_PLAYER_1_PLATFORM: ${{ secrets.R6_PLAYER_1_PLATFORM }}
+          R6_PLAYER_2_NAME: ${{ secrets.R6_PLAYER_2_NAME }}
+          R6_PLAYER_2_PLATFORM: ${{ secrets.R6_PLAYER_2_PLATFORM }}
+          R6_PLAYER_3_NAME: ${{ secrets.R6_PLAYER_3_NAME }}
+          R6_PLAYER_3_PLATFORM: ${{ secrets.R6_PLAYER_3_PLATFORM }}
+          FN_PLAYER_1_NAME: ${{ secrets.FN_PLAYER_1_NAME }}
+          FN_PLAYER_1_ACCOUNT_TYPE: ${{ secrets.FN_PLAYER_1_ACCOUNT_TYPE }}
+          FN_PLAYER_2_NAME: ${{ secrets.FN_PLAYER_2_NAME }}
+          FN_PLAYER_2_ACCOUNT_TYPE: ${{ secrets.FN_PLAYER_2_ACCOUNT_TYPE }}
+          FN_PLAYER_3_NAME: ${{ secrets.FN_PLAYER_3_NAME }}
+          FN_PLAYER_3_NAME_FALLBACK: ${{ secrets.FN_PLAYER_3_NAME_FALLBACK }}
+          FN_PLAYER_3_ACCOUNT_TYPE: ${{ secrets.FN_PLAYER_3_ACCOUNT_TYPE }}
+        run: python -m tracker
+
+      - name: Commit overwritten stats.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add stats.json
+          if git diff --staged --quiet; then
+            echo "stats.json unchanged"
+          else
+            git commit -m "chore: overwrite stats.json current snapshot"
+            git push
+          fi
