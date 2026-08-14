@@ -1,12 +1,12 @@
 # Discord stats tracker
 
-Posts **Rainbow Six Siege** and **Fortnite** stat changes to a Discord webhook every **15 minutes**. Hosted entirely on GitHub Actions — no VPS, no always-on PC.
+Posts **Rainbow Six Siege** and **Fortnite** stat changes to a Discord webhook every **10 minutes**. Hosted entirely on GitHub Actions — no VPS, no always-on PC.
 
 This repo is a template. Fork it, add your own secrets, run the workflow once, then leave it.
 
 | | |
 |---|---|
-| Schedule | every 15 minutes (external ping; GitHub cron is only a fallback) |
+| Schedule | every 10 minutes (external ping; GitHub cron is only a fallback) |
 | Players | 3 Siege + 3 Fortnite |
 | Discord | one embed per player who actually changed; **no pings** |
 | Privacy | usernames and keys stay in GitHub Secrets; `stats.json` is anonymous |
@@ -17,7 +17,7 @@ This repo is a template. Fork it, add your own secrets, run the workflow once, t
 
 | Path | What it is |
 |---|---|
-| [`.github/workflows/workflow.yml`](.github/workflows/workflow.yml) | The 15-minute GitHub Action |
+| [`.github/workflows/workflow.yml`](.github/workflows/workflow.yml) | The 10-minute GitHub Action |
 | [`.env.example`](.env.example) | Names of every secret you must fill in |
 | [`stats.json`](stats.json) | Last known stats (anonymous keys only). The Action overwrites this file. |
 | [`tracker/`](tracker/) | Python bot |
@@ -75,17 +75,17 @@ The first successful fetch is a **silent baseline** (no Discord spam from `0 →
 
 Scheduled workflows stay off on a brand-new public repo until that first manual run.
 
-### 6. Make the 15-minute check actually on time (one-time)
+### 6. Make the 10-minute check actually on time (one-time)
 
 GitHub's own cron on a **public** repo is often 1–2 hours late. Discord still posts in the same run as soon as a stat changes — the check just does not start on time.
 
-Keep using GitHub Actions as the host. Add a free [cron-job.org](https://cron-job.org) job that presses **Run workflow** every 15 minutes:
+Keep using GitHub Actions as the host. Add a free [cron-job.org](https://cron-job.org) job that presses **Run workflow** every 10 minutes:
 
 1. Create a [fine-grained PAT](https://github.com/settings/personal-access-tokens/new): only this repo, permission **Actions: Read and write**, expiration 1 year. Copy it once. Do not commit it.
 2. On [cron-job.org](https://cron-job.org) → Create cronjob:
    - Title: `r6-fn tracker`
    - Address: `https://api.github.com/repos/Squiddoo/r6-fn-discord-tracker/actions/workflows/workflow.yml/dispatches`
-   - Schedule: every 15 minutes
+   - Schedule: every 10 minutes
    - Request method: `POST`
    - Headers:
      - `Accept: application/vnd.github+json`

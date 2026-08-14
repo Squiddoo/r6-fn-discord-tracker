@@ -1,12 +1,12 @@
 # Discord is sent in the same run the moment a tracked number changes.
 # GitHub's own cron is often 1-2 hours late on public repos, so treat
-# `schedule` as a fallback. For a real 15-minute cadence, ping
+# `schedule` as a fallback. For a real 10-minute cadence, ping
 # workflow_dispatch or repository_dispatch (see README).
 name: Track player stats
 
 on:
   schedule:
-    - cron: "7,22,37,52 * * * *"
+    - cron: "4,14,24,34,44,54 * * * *"
   workflow_dispatch:
   repository_dispatch:
     types: [track]
