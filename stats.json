@@ -67,7 +67,9 @@
     "solo_wins": 10,
     "duo_wins": 15,
     "squad_wins": 6,
-    "battle_pass_level": 128
+    "battle_pass_level": 128,
+    "br_rank": "Unranked",
+    "reload_rank": "Unranked"
   },
   "player_2_fn": {
     "wins": 483,
@@ -77,7 +79,9 @@
     "solo_wins": 50,
     "duo_wins": 154,
     "squad_wins": 170,
-    "battle_pass_level": 25
+    "battle_pass_level": 25,
+    "br_rank": "Unranked",
+    "reload_rank": "Unranked"
   },
   "player_3_fn": {
     "wins": 243,
@@ -87,6 +91,8 @@
     "solo_wins": 11,
     "duo_wins": 41,
     "squad_wins": 39,
-    "battle_pass_level": 56
+    "battle_pass_level": 56,
+    "br_rank": "Unranked",
+    "reload_rank": "Unranked"
   }
 }
