@@ -1,3 +1,4 @@
+# Runs every 15 minutes. Secrets come from the repo's Actions secrets, never from git.
 name: Track player stats
 
 on:
