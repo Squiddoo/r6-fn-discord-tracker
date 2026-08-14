@@ -1,0 +1,4 @@
+httpx>=0.27,<1
+fortnite-api>=3.3,<4
+python-dotenv>=1.0,<2
+siegeapi>=6.3,<8

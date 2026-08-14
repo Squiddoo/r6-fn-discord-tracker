@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Stats tracker · Discord embed preview</title>
+  <style>
+    :root {
+      --bg: #313338;
+      --embed: #2b2d31;
+      --text: #dbdee1;
+      --muted: #b5bac1;
+      --heading: #f2f3f5;
+      --code: #1e1f22;
+      --gold: #c4a35a;
+      --purple: #9b59f5;
+      --bot: #5865f2;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #1e1f22;
+      color: var(--text);
+      font-family: "gg sans", "Noto Sans", Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+    .page {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 32px 20px 48px;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 22px;
+      color: var(--heading);
+    }
+    .note {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+      margin: 0 0 28px;
+    }
+    .message {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(160deg, #5865f2, #3ba55d);
+      flex: 0 0 40px;
+    }
+    .meta {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .bot-name { font-weight: 600; color: #fff; }
+    .badge {
+      background: var(--bot);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      border-radius: 3px;
+      padding: 1px 4px;
+      text-transform: uppercase;
+    }
+    .time { color: #949ba4; font-size: 12px; }
+    .embed {
+      max-width: 432px;
+      background: var(--embed);
+      border-radius: 4px;
+      padding: 8px 16px 12px 12px;
+      position: relative;
+    }
+    .embed::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      border-radius: 4px 0 0 4px;
+      background: var(--bar);
+    }
+    .embed.r6 { --bar: var(--gold); }
+    .embed.fn { --bar: var(--purple); }
+    .author {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 8px 80px 4px 0;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--heading);
+    }
+    .author img {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .title {
+      margin: 0 88px 4px 0;
+      font-weight: 700;
+      color: var(--heading);
+      font-size: 16px;
+      line-height: 1.25;
+    }
+    .desc {
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.375;
+      margin: 0 88px 8px 0;
+    }
+    .thumb {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 80px;
+      height: 80px;
+      border-radius: 4px;
+      object-fit: cover;
+    }
+    .fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 12px;
+      margin-top: 6px;
+    }
+    .field.wide {
+      grid-column: 1 / -1;
+    }
+    .field-name {
+      color: var(--heading);
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .field-value {
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.45;
+      white-space: pre-line;
+    }
+    .bold { font-weight: 700; color: var(--heading); }
+    .code {
+      background: var(--code);
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-family: Consolas, "gg mono", ui-monospace, monospace;
+      font-size: 13px;
+    }
+    .footer {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      color: #949ba4;
+      font-size: 12px;
+    }
+    .footer img {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .footer .dot { margin: 0 2px; }
+    @media (max-width: 640px) {
+      .fields { grid-template-columns: 1fr; }
+      .title, .desc, .author { margin-right: 88px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <h1>What Discord will look like</h1>
+    <p class="note">
+      Game as the author, in-game name as the title, grouped stats — not a wall of inline fields.
+      Example names only. Live Discord uses the real username from secrets; GitHub still stores
+      <code class="code">player_1_r6</code> / <code class="code">player_1_fn</code>. Nobody is pinged.
+    </p>
+
+    <article class="message">
+      <div class="avatar" aria-hidden="true"></div>
+      <div>
+        <div class="meta">
+          <span class="bot-name">Stats Tracker</span>
+          <span class="badge">App</span>
+          <span class="time">Today at 1:48 AM</span>
+        </div>
+        <div class="embed r6">
+          <img class="thumb" alt="" src="https://cdn.akamai.steamstatic.com/steam/apps/359550/library_600x900.jpg" />
+          <div class="author">
+            <img alt="" src="https://cdn.cloudflare.steamstatic.com/steam/apps/359550/hero_capsule.jpg" />
+            Rainbow Six Siege
+          </div>
+          <div class="title">KaelNova</div>
+          <p class="desc">Ranked · <span class="bold">Gold 2</span> → <span class="bold">Gold 1</span></p>
+          <div class="fields">
+            <div class="field">
+              <div class="field-name">Ranked</div>
+              <div class="field-value"><span class="bold">Rank</span> · <span class="code">Gold 2</span> → <span class="code">Gold 1</span>
+<span class="bold">RP</span> · <span class="code">3,204</span> → <span class="code">3,270</span>  (+66)
+<span class="bold">K/D</span> · <span class="code">1.09</span> → <span class="code">1.10</span>  (+0.01)
+<span class="bold">Wins</span> · <span class="code">38</span> → <span class="code">39</span>  (+1)
+<span class="bold">Kills</span> · <span class="code">450</span> → <span class="code">455</span>  (+5)
+<span class="bold">Deaths</span> · <span class="code">412</span> → <span class="code">414</span>  (+2)</div>
+            </div>
+            <div class="field">
+              <div class="field-name">Casual</div>
+              <div class="field-value"><span class="bold">Rank</span> · <span class="code">Silver 1</span> → <span class="code">Gold 3</span>
+<span class="bold">MMR</span> · <span class="code">2,500</span> → <span class="code">2,560</span>  (+60)
+<span class="bold">Kills</span> · <span class="code">880</span> → <span class="code">886</span>  (+6)</div>
+            </div>
+            <div class="field wide">
+              <div class="field-name">Overall</div>
+              <div class="field-value"><span class="bold">Kills</span> · <span class="code">2,104</span> → <span class="code">2,115</span>  (+11)
+<span class="bold">K/D</span> · <span class="code">1.18</span> → <span class="code">1.19</span>  (+0.01)
+<span class="bold">Level</span> · <span class="code">142</span> → <span class="code">143</span>  (+1)</div>
+            </div>
+          </div>
+          <div class="footer">
+            <img alt="" src="https://cdn.cloudflare.steamstatic.com/steam/apps/359550/hero_capsule.jpg" />
+            Checked every 15 minutes <span class="dot">•</span> Today at 1:48 AM
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="message">
+      <div class="avatar" aria-hidden="true"></div>
+      <div>
+        <div class="meta">
+          <span class="bot-name">Stats Tracker</span>
+          <span class="badge">App</span>
+          <span class="time">Today at 1:48 AM</span>
+        </div>
+        <div class="embed fn">
+          <img class="thumb" alt="" src="https://cdn2.unrealengine.com/14br-consoles-1920x1080-wlogo-1920x1080-432974386.jpg" />
+          <div class="author">
+            <img alt="" src="https://cdn2.unrealengine.com/14br-consoles-1920x1080-wlogo-1920x1080-432974386.jpg" />
+            Fortnite
+          </div>
+          <div class="title">Driftwave</div>
+          <p class="desc"><span class="bold">Victory Royale</span></p>
+          <div class="fields">
+            <div class="field">
+              <div class="field-name">Career</div>
+              <div class="field-value"><span class="bold">Victory Royales</span> · <span class="code">223</span> → <span class="code">224</span>  (+1)
+<span class="bold">Eliminations</span> · <span class="code">8,105</span> → <span class="code">8,112</span>  (+7)
+<span class="bold">Matches</span> · <span class="code">1,862</span> → <span class="code">1,863</span>  (+1)
+<span class="bold">K/D</span> · <span class="code">4.35</span> → <span class="code">4.36</span>  (+0.01)</div>
+            </div>
+            <div class="field">
+              <div class="field-name">Modes</div>
+              <div class="field-value"><span class="bold">Squad</span> · <span class="code">94</span> → <span class="code">95</span>  (+1)</div>
+            </div>
+            <div class="field wide">
+              <div class="field-name">Season</div>
+              <div class="field-value"><span class="bold">Battle Pass</span> · <span class="code">67</span> → <span class="code">68</span>  (+1)</div>
+            </div>
+          </div>
+          <div class="footer">
+            <img alt="" src="https://cdn2.unrealengine.com/14br-consoles-1920x1080-wlogo-1920x1080-432974386.jpg" />
+            Checked every 15 minutes <span class="dot">•</span> Today at 1:48 AM
+          </div>
+        </div>
+      </div>
+    </article>
+  </div>
+</body>
+</html>
