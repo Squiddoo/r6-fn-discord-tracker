@@ -11,14 +11,15 @@ from siegeapi import Auth
 from tracker.arenyze import fetch_r6_player_arenyze
 from tracker.compare import diff_stats, is_uninitialized
 from tracker.config import load_settings
-from tracker.discord_webhook import build_embed, send_embed
+from tracker.discord_webhook import build_embed, refresh_game_embeds, send_embed
 from tracker.fortnite import fetch_fn_player
 from tracker.r6 import PLAYER_GAP_SECONDS, connect_with_backoff, fetch_r6_player
 from tracker.schema import empty_snapshot, labels_for
-from tracker.store import load_snapshot, write_snapshot
+from tracker.store import load_message_ids, load_snapshot, write_message_ids, write_snapshot
 
 ROOT = Path(__file__).resolve().parent.parent
 STATS_PATH = ROOT / "stats.json"
+MESSAGES_PATH = ROOT / "discord_messages.json"
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -49,6 +50,7 @@ async def _send_preview(
             game=game,
             display_name=display_name,
             changes=changes,
+            stats=new_stats,
             preview=True,
         ),
     )
@@ -172,39 +174,50 @@ async def run(*, preview_once: bool = False, preview_only: str = "both") -> int:
             notified += 1
         print("Preview sent; saving overwrite-only baseline without 0->real spam.")
     else:
-        for player in settings.r6_players:
-            old = previous[player.key]
-            new = snapshot[player.key]
-            if old == new:
+        message_ids = load_message_ids(MESSAGES_PATH)
+        game_players = (
+            ("r6", settings.r6_players),
+            ("fn", settings.fn_players),
+        )
+        for game, players in game_players:
+            embeds = []
+            for player in players:
+                old = previous[player.key]
+                new = snapshot[player.key]
+                if old == new:
+                    continue
+                if is_uninitialized(old):
+                    print(f"Baseline saved for {player.key}; skipping Discord.")
+                    continue
+                changes = diff_stats(old, new, labels_for(player.key))
+                if not changes:
+                    continue
+                embeds.append(
+                    build_embed(
+                        game=game,
+                        display_name=display_names[player.key],
+                        changes=changes,
+                        stats=new,
+                    )
+                )
+            if not embeds:
                 continue
-            if is_uninitialized(old):
-                print(f"Baseline saved for {player.key}; skipping Discord.")
-                continue
-            changes = diff_stats(old, new, labels_for(player.key))
-            if not changes:
-                continue
-            await send_embed(
-                settings.webhook_url,
-                build_embed(game="r6", display_name=display_names[player.key], changes=changes),
-            )
-            notified += 1
-
-        for player in settings.fn_players:
-            old = previous[player.key]
-            new = snapshot[player.key]
-            if old == new:
-                continue
-            if is_uninitialized(old):
-                print(f"Baseline saved for {player.key}; skipping Discord.")
-                continue
-            changes = diff_stats(old, new, labels_for(player.key))
-            if not changes:
-                continue
-            await send_embed(
-                settings.webhook_url,
-                build_embed(game="fn", display_name=display_names[player.key], changes=changes),
-            )
-            notified += 1
+            try:
+                old_ids = message_ids.get(game, [])
+                message_ids[game] = await refresh_game_embeds(
+                    settings.webhook_url,
+                    old_ids,
+                    embeds,
+                )
+                notified += len(embeds)
+                print(
+                    f"Refreshed {game} Discord message "
+                    f"(posted {len(embeds)}, removed {len(old_ids)})."
+                )
+            except Exception as exc:
+                failures.append(_safe_failure(f"discord_{game}", exc))
+                print(f"::warning::{failures[-1]}")
+        write_message_ids(MESSAGES_PATH, message_ids)
 
     write_snapshot(STATS_PATH, snapshot)
     print(f"Wrote current snapshot to {STATS_PATH}")
