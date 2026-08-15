@@ -411,6 +411,26 @@ async def send_embed(webhook_url: str, embed: dict[str, Any]) -> str:
     return await send_embeds(webhook_url, [embed])
 
 
+async def edit_embeds(
+    webhook_url: str,
+    message_id: str,
+    embeds: list[dict[str, Any]],
+) -> bool:
+    """Overwrite an existing webhook message in place. False if it is gone."""
+    if not embeds or not message_id.isdigit():
+        return False
+    url = f"{_webhook_base(webhook_url)}/messages/{message_id}"
+    async with httpx.AsyncClient(timeout=30.0) as client:
+        response = await _request(client, "PATCH", url, json=_payload(embeds))
+    if response.status_code in {200, 201}:
+        return True
+    if response.status_code == 404:
+        return False
+    raise RuntimeError(
+        f"Discord webhook edit failed with HTTP {response.status_code}: {response.text[:300]}"
+    )
+
+
 async def delete_message(webhook_url: str, message_id: str) -> bool:
     if not message_id.isdigit():
         return False
@@ -421,7 +441,7 @@ async def delete_message(webhook_url: str, message_id: str) -> bool:
         return True
     print(
         f"::warning::Could not delete Discord message {message_id}: "
-        f"HTTP {response.status_code}"
+        f"HTTP {response.status_code} {response.text[:200]}"
     )
     return False
 
@@ -431,9 +451,34 @@ async def refresh_game_embeds(
     previous_ids: list[str],
     embeds: list[dict[str, Any]],
 ) -> list[str]:
-    """Post the new game message first, then delete the previous one(s)."""
-    new_id = await send_embeds(webhook_url, embeds)
-    for old_id in previous_ids:
-        if old_id != new_id:
-            await delete_message(webhook_url, old_id)
-    return [new_id]
+    """Keep one live message per game: edit in place, else post and purge leftovers."""
+    keep_id: str | None = None
+    stale = list(previous_ids)
+
+    if stale:
+        candidate = stale[0]
+        try:
+            edited = await edit_embeds(webhook_url, candidate, embeds)
+        except Exception as exc:
+            print(f"::warning::Discord edit failed for {candidate}: {exc}")
+            edited = False
+        if edited:
+            keep_id = candidate
+            stale = stale[1:]
+            print(f"Edited Discord message {keep_id} in place.")
+        else:
+            print(f"Discord message {candidate} missing; posting a new one.")
+
+    if keep_id is None:
+        keep_id = await send_embeds(webhook_url, embeds)
+        print(f"Posted Discord message {keep_id}.")
+
+    removed = 0
+    for old_id in stale:
+        if old_id == keep_id:
+            continue
+        if await delete_message(webhook_url, old_id):
+            removed += 1
+    if removed:
+        print(f"Removed {removed} previous Discord message(s).")
+    return [keep_id]
