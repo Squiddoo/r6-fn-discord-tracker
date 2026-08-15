@@ -8,13 +8,13 @@ import httpx
 
 from tracker.compare import StatChange, numeric_delta
 
-R6_COLOR = 0xC4A35A
-FN_COLOR = 0x9B59F5
+# Muted gold (Siege) / cool cyan (Fortnite) — avoid default bot-purple.
+R6_COLOR = 0xC2A15A
+FN_COLOR = 0x2AA8D8
 
-R6_ICON = "https://cdn.cloudflare.steamstatic.com/steam/apps/359550/hero_capsule.jpg"
-R6_THUMB = "https://cdn.akamai.steamstatic.com/steam/apps/359550/library_600x900.jpg"
+# Author marks — wide art is cropped by Discord; keep known-stable hosts.
+R6_ICON = "https://cdn.cloudflare.steamstatic.com/steam/apps/359550/capsule_231x87.jpg"
 FN_ICON = "https://cdn2.unrealengine.com/14br-consoles-1920x1080-wlogo-1920x1080-432974386.jpg"
-FN_THUMB = FN_ICON
 
 R6_GROUPS: tuple[tuple[str, tuple[str, ...]], ...] = (
     (
@@ -110,9 +110,16 @@ FN_HEADLINE_FIELDS = (
 )
 
 RANK_FIELDS = {"ranked_rank", "casual_rank", "br_rank", "reload_rank"}
-SUMMARY_SKIP = RANK_FIELDS
-FN_PINNED_FIELDS = ("kd",)
+MILESTONE_FIELDS = RANK_FIELDS | {
+    "wins",
+    "solo_wins",
+    "duo_wins",
+    "squad_wins",
+    "ranked_wins",
+}
+MAX_EVIDENCE_FIELDS = 6
 BLANK = "\u200b"
+BRAND = "R6/FN Tracker"
 
 
 def _format_value(value: Any) -> str:
@@ -168,7 +175,7 @@ def _headline(game: str, changes: list[StatChange]) -> str:
     if change.field == "rank_points":
         delta = _delta_of(change)
         if delta is not None:
-            return f"**{_format_delta(delta)} RP** this check"
+            return f"**{_format_delta(delta)} RP**"
 
     if change.field == "ranked_wins":
         delta = _delta_of(change)
@@ -212,38 +219,28 @@ def _headline(game: str, changes: list[StatChange]) -> str:
     delta = _delta_of(change)
     label = SHORT_LABELS.get(change.field, change.label)
     if delta is None:
-        return f"**{label}**  {_format_value(change.old)} → **{_format_value(change.new)}**"
-    return f"**{label}**  {_format_value(change.new)}  `{_format_delta(delta)}`"
-
-
-def _summary_line(changes: list[StatChange]) -> str | None:
-    bits: list[str] = []
-    for change in changes:
-        if change.field in SUMMARY_SKIP:
-            continue
-        delta = numeric_delta(change.old, change.new)
-        if delta is None or delta == 0:
-            continue
-        label = SHORT_LABELS.get(change.field, change.label)
-        bits.append(f"`{_format_delta(delta)}` {label}")
-        if len(bits) == 6:
-            break
-    if not bits:
-        return None
-    return " · ".join(bits)
+        return f"**{label}** · {_format_value(change.old)} → **{_format_value(change.new)}**"
+    return f"**{label}** · {_format_value(change.new)} `{_format_delta(delta)}`"
 
 
 def _stat_value(change: StatChange) -> str:
+    """Current value + delta only. Old value only for rank swaps."""
     new = _format_value(change.new)
-    old = _format_value(change.old)
     delta = numeric_delta(change.old, change.new)
-    if change.field in RANK_FIELDS or delta is None:
+
+    if change.field in RANK_FIELDS:
         if change.old == change.new:
             return f"**{new}**"
-        return f"**{new}**\n{old}"
+        return f"**{new}**\nfrom {_format_value(change.old)}"
+
+    if delta is None:
+        if change.old == change.new:
+            return f"**{new}**"
+        return f"**{new}**\nfrom {_format_value(change.old)}"
+
     if delta == 0:
         return f"**{new}**"
-    return f"**{new}**\n{old} → `{_format_delta(delta)}`"
+    return f"**{new}**\n`{_format_delta(delta)}`"
 
 
 def _pad_inline(count: int) -> list[dict[str, Any]]:
@@ -253,23 +250,16 @@ def _pad_inline(count: int) -> list[dict[str, Any]]:
     return [{"name": BLANK, "value": BLANK, "inline": True}] * (3 - remainder)
 
 
-def _pin_current_fields(
-    game: str,
-    by_field: dict[str, StatChange],
-    stats: dict[str, Any] | None,
-) -> None:
-    if game != "fn" or not stats:
-        return
-    for field in FN_PINNED_FIELDS:
-        if field in by_field or field not in stats:
-            continue
-        value = stats[field]
-        by_field[field] = StatChange(
-            field=field,
-            label=SHORT_LABELS.get(field, field),
-            old=value,
-            new=value,
-        )
+def _primary_group_title(game: str, changes: list[StatChange]) -> str | None:
+    """Prefer the group that owns the headline change."""
+    if not changes:
+        return None
+    headline = _pick_headline_change(game, changes)
+    groups = R6_GROUPS if game == "r6" else FN_GROUPS
+    for title, keys in groups:
+        if headline.field in keys:
+            return title
+    return None
 
 
 def _scoreboard_fields(
@@ -277,18 +267,50 @@ def _scoreboard_fields(
     changes: list[StatChange],
     stats: dict[str, Any] | None = None,
 ) -> list[dict[str, Any]]:
+    del stats  # kept for call-site compatibility; no longer pin unchanged filler
+    if not changes:
+        return []
+
+    # Single numeric tick is already the headline — skip a redundant field row.
+    if len(changes) == 1 and changes[0].field not in RANK_FIELDS:
+        return []
+
     groups = R6_GROUPS if game == "r6" else FN_GROUPS
     by_field = {change.field: change for change in changes}
-    _pin_current_fields(game, by_field, stats)
-    active = [(title, [by_field[key] for key in keys if key in by_field]) for title, keys in groups]
-    active = [(title, group) for title, group in active if group]
-    show_headers = len(active) > 1 or (active and len(active[0][1]) > 3)
+    primary = _primary_group_title(game, changes)
+    headline_field = _pick_headline_change(game, changes).field
 
+    ordered: list[tuple[str, list[StatChange]]] = []
+    for title, keys in groups:
+        group = [by_field[key] for key in keys if key in by_field]
+        if group:
+            ordered.append((title, group))
+
+    # Lead with the story group; drop side modes when the story is already full.
+    if primary:
+        ordered.sort(key=lambda item: 0 if item[0] == primary else 1)
+    if ordered and len(ordered[0][1]) >= 3:
+        ordered = ordered[:1]
+    else:
+        ordered = ordered[:2]
+
+    show_headers = len(ordered) > 1
     fields: list[dict[str, Any]] = []
-    for title, group in active:
+    remaining = MAX_EVIDENCE_FIELDS
+
+    for title, group in ordered:
+        if remaining <= 0:
+            break
+        # Rank/VR headline already states the new label — keep supporting numbers.
+        evidence = [
+            change
+            for change in group
+            if not (change.field == headline_field and change.field in RANK_FIELDS)
+        ] or group
+        chunk = evidence[:remaining]
         if show_headers:
             fields.append({"name": title, "value": BLANK, "inline": False})
-        for change in group:
+        for change in chunk:
             fields.append(
                 {
                     "name": SHORT_LABELS.get(change.field, change.label),
@@ -296,8 +318,14 @@ def _scoreboard_fields(
                     "inline": True,
                 }
             )
-        fields.extend(_pad_inline(len(group)))
+        fields.extend(_pad_inline(len(chunk)))
+        remaining -= len(chunk)
+
     return fields
+
+
+def _should_show_thumbnail(changes: list[StatChange]) -> bool:
+    return any(change.field in MILESTONE_FIELDS for change in changes)
 
 
 def build_embed(
@@ -310,28 +338,26 @@ def build_embed(
 ) -> dict[str, Any]:
     is_r6 = game == "r6"
     name = _safe_display_name(display_name)
-    author_name = "Rainbow Six Siege" if is_r6 else "Fortnite"
-    headline = _headline(game, changes) if changes else "Tracked stats updated."
-    summary = _summary_line(changes) if changes else None
-    description = f"{headline}\n{summary}" if summary else headline
-    footer = "Preview" if preview else "Stats tracker"
+    icon = R6_ICON if is_r6 else FN_ICON
+    headline = _headline(game, changes) if changes else "Stats updated."
+    footer = f"{BRAND} · preview" if preview else BRAND
 
-    return {
+    embed: dict[str, Any] = {
         "author": {
-            "name": author_name,
-            "icon_url": R6_ICON if is_r6 else FN_ICON,
+            "name": "Siege" if is_r6 else "Fortnite",
+            "icon_url": icon,
         },
         "title": name,
-        "description": description,
+        "description": headline,
         "color": R6_COLOR if is_r6 else FN_COLOR,
-        "thumbnail": {"url": R6_THUMB if is_r6 else FN_THUMB},
         "fields": _scoreboard_fields(game, changes, stats),
-        "footer": {
-            "text": footer,
-            "icon_url": R6_ICON if is_r6 else FN_ICON,
-        },
+        "footer": {"text": footer},
         "timestamp": datetime.now(timezone.utc).isoformat(),
     }
+    # Thumbnail only on milestones so routine RP ticks stay clean.
+    if preview or _should_show_thumbnail(changes):
+        embed["thumbnail"] = {"url": icon}
+    return embed
 
 
 def _webhook_base(webhook_url: str) -> str:
