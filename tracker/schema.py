@@ -40,8 +40,8 @@ FN_FIELDS: dict[str, int | float | str] = {
     "reload_rank": "Unranked",
 }
 
-R6_KEYS = ("player_1_r6", "player_2_r6", "player_3_r6")
-FN_KEYS = ("player_1_fn", "player_2_fn", "player_3_fn")
+R6_KEYS = ("player_1_r6", "player_2_r6", "player_3_r6", "player_4_r6")
+FN_KEYS = ("player_1_fn", "player_2_fn", "player_3_fn", "player_4_fn")
 PLAYER_KEYS = (*R6_KEYS, *FN_KEYS)
 
 R6_LABELS = {

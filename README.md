@@ -7,7 +7,7 @@ This repo is a template. Fork it, add your own secrets, run the workflow once, t
 | | |
 |---|---|
 | Schedule | every 10 minutes (external ping; GitHub cron is only a fallback) |
-| Players | 3 Siege + 3 Fortnite |
+| Players | 4 Siege + 4 Fortnite |
 | Discord | one embed per player who actually changed; **no pings** |
 | Privacy | usernames and keys stay in GitHub Secrets; `stats.json` is anonymous |
 
@@ -59,10 +59,10 @@ Add every name from [`.env.example`](.env.example). The important ones:
 | `FORTNITE_API_KEY` | Required |
 | `ARENYZE_API_KEY` | Recommended for Siege |
 | `UBISOFT_EMAIL` / `UBISOFT_PASSWORD` | Optional if Arenyze is set |
-| `R6_PLAYER_1_NAME` … `_3_NAME` | In-game names |
-| `R6_PLAYER_1_PLATFORM` … `_3_PLATFORM` | `pc`, `psn`, or `xbox` (default `pc`) |
-| `FN_PLAYER_1_NAME` … `_3_NAME` | Epic / PSN / Xbox display names |
-| `FN_PLAYER_1_ACCOUNT_TYPE` … `_3_ACCOUNT_TYPE` | `epic`, `psn`, or `xbl` (default `epic`) |
+| `R6_PLAYER_1_NAME` … `_4_NAME` | In-game names |
+| `R6_PLAYER_1_PLATFORM` … `_4_PLATFORM` | `pc`, `psn`, or `xbox` (1–3 default `pc`, 4 defaults `psn`) |
+| `FN_PLAYER_1_NAME` … `_4_NAME` | Epic / PSN / Xbox display names |
+| `FN_PLAYER_1_ACCOUNT_TYPE` … `_4_ACCOUNT_TYPE` | `epic`, `psn`, or `xbl` (1–3 default `epic`, 4 defaults `psn`) |
 | `FN_PLAYER_3_NAME_FALLBACK` | Optional second Fortnite name if the first 404s |
 
 Player names never go in `stats.json`. Discord **does** show the live name in the embed.
@@ -74,6 +74,8 @@ Player names never go in `stats.json`. Discord **does** show the live name in th
 The first successful fetch is a **silent baseline** (no Discord spam from `0 → real stats`). After that, the cron job posts only when a tracked number changes, and commits the new `stats.json`.
 
 Scheduled workflows stay off on a brand-new public repo until that first manual run.
+
+To **send current stats to Discord once** (even if nothing changed): Run workflow, check **Send a one-time Discord preview**, optionally pick Siege / Fortnite / both, then run. That posts one webhook message per game with all four fetched players, marked as Preview. The 10-minute job still only posts on real changes.
 
 ### 6. Make the 10-minute check actually on time (one-time)
 
@@ -127,6 +129,14 @@ Fill `.env`, then:
 python -m tracker
 ```
 
+One-time Discord preview of current stats for every fetched player (does not wait for a change):
+
+```bash
+python -m tracker --preview-once
+python -m tracker --preview-once --preview-only r6
+python -m tracker --preview-once --preview-only fn
+```
+
 (The bot loads `.env` by itself. You do not need to export variables in PowerShell.)
 
 ---
@@ -152,4 +162,4 @@ Someone who clones this gets empty placeholders. Running it without *their own* 
 | `Missing required environment variable` | A secret name does not match `.env.example` |
 | Siege 429 / Ubisoft rate limit | Normal on GitHub IPs — set `ARENYZE_API_KEY` |
 | Fortnite 403 / 404 | Stats are private, or the display name / account type is wrong |
-| No Discord message after first run | First run is silent on purpose; wait for a real stat change |
+| No Discord message after first run | First run is silent on purpose; wait for a real stat change, or send a one-time preview (step 5) |

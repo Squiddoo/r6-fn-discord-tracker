@@ -94,5 +94,37 @@
     "battle_pass_level": 80,
     "br_rank": "Unranked",
     "reload_rank": "Unranked"
+  },
+  "player_4_r6": {
+    "ranked_kills": 0,
+    "ranked_deaths": 0,
+    "ranked_wins": 0,
+    "ranked_kd": 0.0,
+    "rank_points": 0,
+    "ranked_rank": "Unranked",
+    "casual_kills": 0,
+    "casual_deaths": 0,
+    "casual_wins": 0,
+    "casual_kd": 0.0,
+    "casual_mmr": 0,
+    "casual_rank": "Unranked",
+    "overall_kills": 0,
+    "overall_deaths": 0,
+    "overall_wins": 0,
+    "overall_kd": 0.0,
+    "level": 0,
+    "time_played_hours": 0
+  },
+  "player_4_fn": {
+    "wins": 0,
+    "kills": 0,
+    "matches": 0,
+    "kd": 0.0,
+    "solo_wins": 0,
+    "duo_wins": 0,
+    "squad_wins": 0,
+    "battle_pass_level": 0,
+    "br_rank": "Unranked",
+    "reload_rank": "Unranked"
   }
 }

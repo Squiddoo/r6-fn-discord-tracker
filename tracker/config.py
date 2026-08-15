@@ -50,12 +50,14 @@ class Settings:
 def load_settings() -> Settings:
     r6_players = []
     fn_players = []
-    for index in (1, 2, 3):
+    for index in (1, 2, 3, 4):
+        default_platform = "psn" if index == 4 else "pc"
+        default_account = "psn" if index == 4 else "epic"
         r6_players.append(
             R6Player(
                 key=f"player_{index}_r6",
                 username=_require(f"R6_PLAYER_{index}_NAME"),
-                platform=_optional(f"R6_PLAYER_{index}_PLATFORM", "pc").lower(),
+                platform=_optional(f"R6_PLAYER_{index}_PLATFORM", default_platform).lower(),
             )
         )
         fallback = os.environ.get(f"FN_PLAYER_{index}_NAME_FALLBACK", "").strip() or None
@@ -63,7 +65,9 @@ def load_settings() -> Settings:
             FNPlayer(
                 key=f"player_{index}_fn",
                 username=_require(f"FN_PLAYER_{index}_NAME"),
-                account_type=_optional(f"FN_PLAYER_{index}_ACCOUNT_TYPE", "epic").lower(),
+                account_type=_optional(
+                    f"FN_PLAYER_{index}_ACCOUNT_TYPE", default_account
+                ).lower(),
                 fallback_username=fallback,
             )
         )
