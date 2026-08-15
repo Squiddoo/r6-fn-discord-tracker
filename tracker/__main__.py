@@ -211,12 +211,14 @@ async def run(*, preview_once: bool = False, preview_only: str = "both") -> int:
                 )
                 notified += len(embeds)
                 print(
-                    f"Refreshed {game} Discord message "
-                    f"(posted {len(embeds)}, removed {len(old_ids)})."
+                    f"Updated {game} Discord message "
+                    f"({len(embeds)} embed(s); prior ids={len(old_ids)})."
                 )
             except Exception as exc:
                 failures.append(_safe_failure(f"discord_{game}", exc))
                 print(f"::warning::{failures[-1]}")
+                # Keep prior ids so the next successful run can still edit/purge them.
+                message_ids[game] = old_ids
         write_message_ids(MESSAGES_PATH, message_ids)
 
     write_snapshot(STATS_PATH, snapshot)
