@@ -72,26 +72,26 @@
     "reload_rank": "Unranked"
   },
   "player_2_fn": {
-    "wins": 485,
-    "kills": 23270,
-    "matches": 13870,
+    "wins": 486,
+    "kills": 23278,
+    "matches": 13872,
     "kd": 1.74,
     "solo_wins": 50,
     "duo_wins": 154,
     "squad_wins": 170,
-    "battle_pass_level": 55,
+    "battle_pass_level": 61,
     "br_rank": "Unranked",
     "reload_rank": "Unranked"
   },
   "player_3_fn": {
-    "wins": 247,
-    "kills": 12060,
-    "matches": 4972,
-    "kd": 2.55,
+    "wins": 248,
+    "kills": 12074,
+    "matches": 4974,
+    "kd": 2.56,
     "solo_wins": 11,
     "duo_wins": 41,
     "squad_wins": 39,
-    "battle_pass_level": 73,
+    "battle_pass_level": 79,
     "br_rank": "Unranked",
     "reload_rank": "Unranked"
   }
