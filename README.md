@@ -75,6 +75,8 @@ The first successful fetch is a **silent baseline** (no Discord spam from `0 →
 
 Scheduled workflows stay off on a brand-new public repo until that first manual run.
 
+To **send current stats to Discord once** (even if nothing changed): Run workflow, check **Send a one-time Discord preview**, optionally pick Siege / Fortnite / both, then run. That posts one webhook message per game with all four fetched players, marked as Preview. The 10-minute job still only posts on real changes.
+
 ### 6. Make the 10-minute check actually on time (one-time)
 
 GitHub's own cron on a **public** repo is often 1–2 hours late. Discord still posts in the same run as soon as a stat changes — the check just does not start on time.
@@ -127,6 +129,14 @@ Fill `.env`, then:
 python -m tracker
 ```
 
+One-time Discord preview of current stats for every fetched player (does not wait for a change):
+
+```bash
+python -m tracker --preview-once
+python -m tracker --preview-once --preview-only r6
+python -m tracker --preview-once --preview-only fn
+```
+
 (The bot loads `.env` by itself. You do not need to export variables in PowerShell.)
 
 ---
@@ -152,4 +162,4 @@ Someone who clones this gets empty placeholders. Running it without *their own* 
 | `Missing required environment variable` | A secret name does not match `.env.example` |
 | Siege 429 / Ubisoft rate limit | Normal on GitHub IPs — set `ARENYZE_API_KEY` |
 | Fortnite 403 / 404 | Stats are private, or the display name / account type is wrong |
-| No Discord message after first run | First run is silent on purpose; wait for a real stat change |
+| No Discord message after first run | First run is silent on purpose; wait for a real stat change, or send a one-time preview (step 5) |

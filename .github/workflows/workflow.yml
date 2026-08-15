@@ -8,6 +8,19 @@ on:
   schedule:
     - cron: "4,14,24,34,44,54 * * * *"
   workflow_dispatch:
+    inputs:
+      preview_once:
+        description: "Send a one-time Discord preview (current stats for all 4 players per game)"
+        type: boolean
+        default: false
+      preview_only:
+        description: "Which game(s) to preview (ignored unless the box above is checked)"
+        type: choice
+        options:
+          - both
+          - r6
+          - fn
+        default: both
   repository_dispatch:
     types: [track]
 
@@ -60,7 +73,13 @@ jobs:
           FN_PLAYER_3_ACCOUNT_TYPE: ${{ secrets.FN_PLAYER_3_ACCOUNT_TYPE }}
           FN_PLAYER_4_NAME: ${{ secrets.FN_PLAYER_4_NAME }}
           FN_PLAYER_4_ACCOUNT_TYPE: ${{ secrets.FN_PLAYER_4_ACCOUNT_TYPE }}
-        run: python -m tracker
+        run: |
+          ARGS=()
+          if [ "${{ github.event.inputs.preview_once }}" = "true" ]; then
+            ARGS+=(--preview-once --preview-only "${{ github.event.inputs.preview_only || 'both' }}")
+            echo "One-time Discord preview enabled (${{ github.event.inputs.preview_only || 'both' }})."
+          fi
+          python -m tracker "${ARGS[@]}"
 
       - name: Commit overwritten stats.json
         run: |
