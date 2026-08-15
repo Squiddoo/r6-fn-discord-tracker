@@ -49,6 +49,8 @@ jobs:
           R6_PLAYER_2_PLATFORM: ${{ secrets.R6_PLAYER_2_PLATFORM }}
           R6_PLAYER_3_NAME: ${{ secrets.R6_PLAYER_3_NAME }}
           R6_PLAYER_3_PLATFORM: ${{ secrets.R6_PLAYER_3_PLATFORM }}
+          R6_PLAYER_4_NAME: ${{ secrets.R6_PLAYER_4_NAME }}
+          R6_PLAYER_4_PLATFORM: ${{ secrets.R6_PLAYER_4_PLATFORM }}
           FN_PLAYER_1_NAME: ${{ secrets.FN_PLAYER_1_NAME }}
           FN_PLAYER_1_ACCOUNT_TYPE: ${{ secrets.FN_PLAYER_1_ACCOUNT_TYPE }}
           FN_PLAYER_2_NAME: ${{ secrets.FN_PLAYER_2_NAME }}
@@ -56,6 +58,8 @@ jobs:
           FN_PLAYER_3_NAME: ${{ secrets.FN_PLAYER_3_NAME }}
           FN_PLAYER_3_NAME_FALLBACK: ${{ secrets.FN_PLAYER_3_NAME_FALLBACK }}
           FN_PLAYER_3_ACCOUNT_TYPE: ${{ secrets.FN_PLAYER_3_ACCOUNT_TYPE }}
+          FN_PLAYER_4_NAME: ${{ secrets.FN_PLAYER_4_NAME }}
+          FN_PLAYER_4_ACCOUNT_TYPE: ${{ secrets.FN_PLAYER_4_ACCOUNT_TYPE }}
         run: python -m tracker
 
       - name: Commit overwritten stats.json

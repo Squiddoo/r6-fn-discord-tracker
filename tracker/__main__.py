@@ -227,7 +227,8 @@ async def run(*, preview_once: bool = False, preview_only: str = "both") -> int:
         print("Player fetch failures (previous values kept for those keys):")
         for line in failures:
             print(f"::warning::{line}")
-        if len(failures) >= 6:
+        tracked = len(settings.r6_players) + len(settings.fn_players)
+        if tracked and len(failures) >= tracked:
             return 1
     return 0
 

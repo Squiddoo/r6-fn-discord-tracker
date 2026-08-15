@@ -7,7 +7,7 @@ This repo is a template. Fork it, add your own secrets, run the workflow once, t
 | | |
 |---|---|
 | Schedule | every 10 minutes (external ping; GitHub cron is only a fallback) |
-| Players | 3 Siege + 3 Fortnite |
+| Players | 4 Siege + 4 Fortnite |
 | Discord | one embed per player who actually changed; **no pings** |
 | Privacy | usernames and keys stay in GitHub Secrets; `stats.json` is anonymous |
 
@@ -59,10 +59,10 @@ Add every name from [`.env.example`](.env.example). The important ones:
 | `FORTNITE_API_KEY` | Required |
 | `ARENYZE_API_KEY` | Recommended for Siege |
 | `UBISOFT_EMAIL` / `UBISOFT_PASSWORD` | Optional if Arenyze is set |
-| `R6_PLAYER_1_NAME` … `_3_NAME` | In-game names |
-| `R6_PLAYER_1_PLATFORM` … `_3_PLATFORM` | `pc`, `psn`, or `xbox` (default `pc`) |
-| `FN_PLAYER_1_NAME` … `_3_NAME` | Epic / PSN / Xbox display names |
-| `FN_PLAYER_1_ACCOUNT_TYPE` … `_3_ACCOUNT_TYPE` | `epic`, `psn`, or `xbl` (default `epic`) |
+| `R6_PLAYER_1_NAME` … `_4_NAME` | In-game names |
+| `R6_PLAYER_1_PLATFORM` … `_4_PLATFORM` | `pc`, `psn`, or `xbox` (1–3 default `pc`, 4 defaults `psn`) |
+| `FN_PLAYER_1_NAME` … `_4_NAME` | Epic / PSN / Xbox display names |
+| `FN_PLAYER_1_ACCOUNT_TYPE` … `_4_ACCOUNT_TYPE` | `epic`, `psn`, or `xbl` (1–3 default `epic`, 4 defaults `psn`) |
 | `FN_PLAYER_3_NAME_FALLBACK` | Optional second Fortnite name if the first 404s |
 
 Player names never go in `stats.json`. Discord **does** show the live name in the embed.

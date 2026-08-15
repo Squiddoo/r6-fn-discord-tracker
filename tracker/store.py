@@ -1,4 +1,4 @@
-"""Overwrite-only stats.json. Current snapshot for 6 anonymous keys. No history."""
+"""Overwrite-only stats.json. Current snapshot for anonymous keys. No history."""
 
 from __future__ import annotations
 
@@ -37,7 +37,7 @@ def load_snapshot(path: Path) -> dict[str, dict[str, Any]]:
 
 
 def write_snapshot(path: Path, snapshot: dict[str, dict[str, Any]]) -> None:
-    """Replace the entire file with the current 6-player snapshot. Never append."""
+    """Replace the entire file with the current anonymous snapshot. Never append."""
     clean = empty_snapshot()
     for key in PLAYER_KEYS:
         incoming = snapshot.get(key, {})
