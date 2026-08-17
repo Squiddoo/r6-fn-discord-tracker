@@ -60,10 +60,10 @@
     "time_played_hours": 548
   },
   "player_1_fn": {
-    "wins": 229,
-    "kills": 8207,
-    "matches": 1879,
-    "kd": 4.97,
+    "wins": 230,
+    "kills": 8217,
+    "matches": 1880,
+    "kd": 4.98,
     "solo_wins": 10,
     "duo_wins": 15,
     "squad_wins": 6,
@@ -72,26 +72,26 @@
     "reload_rank": "Unranked"
   },
   "player_2_fn": {
-    "wins": 491,
-    "kills": 23364,
-    "matches": 13887,
-    "kd": 1.74,
+    "wins": 492,
+    "kills": 23373,
+    "matches": 13888,
+    "kd": 1.75,
     "solo_wins": 50,
     "duo_wins": 154,
     "squad_wins": 170,
-    "battle_pass_level": 84,
+    "battle_pass_level": 85,
     "br_rank": "Unranked",
     "reload_rank": "Unranked"
   },
   "player_3_fn": {
-    "wins": 255,
-    "kills": 12203,
-    "matches": 4996,
-    "kd": 2.57,
+    "wins": 256,
+    "kills": 12211,
+    "matches": 4997,
+    "kd": 2.58,
     "solo_wins": 11,
     "duo_wins": 41,
     "squad_wins": 39,
-    "battle_pass_level": 95,
+    "battle_pass_level": 96,
     "br_rank": "Unranked",
     "reload_rank": "Unranked"
   }
