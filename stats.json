@@ -20,11 +20,11 @@
     "time_played_hours": 187
   },
   "player_2_r6": {
-    "ranked_kills": 65,
-    "ranked_deaths": 72,
+    "ranked_kills": 67,
+    "ranked_deaths": 77,
     "ranked_wins": 8,
-    "ranked_kd": 0.9,
-    "rank_points": 1210,
+    "ranked_kd": 0.87,
+    "rank_points": 1200,
     "ranked_rank": "Copper 3",
     "casual_kills": 54,
     "casual_deaths": 29,
@@ -32,12 +32,12 @@
     "casual_kd": 1.86,
     "casual_mmr": 0,
     "casual_rank": "Unranked",
-    "overall_kills": 193,
-    "overall_deaths": 159,
+    "overall_kills": 195,
+    "overall_deaths": 164,
     "overall_wins": 22,
-    "overall_kd": 1.21,
+    "overall_kd": 1.19,
     "level": 73,
-    "time_played_hours": 350
+    "time_played_hours": 352
   },
   "player_3_r6": {
     "ranked_kills": 330,
