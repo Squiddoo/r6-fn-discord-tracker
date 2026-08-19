@@ -60,14 +60,14 @@
     "time_played_hours": 548
   },
   "player_1_fn": {
-    "wins": 234,
-    "kills": 8366,
-    "matches": 1907,
+    "wins": 235,
+    "kills": 8379,
+    "matches": 1909,
     "kd": 5.0,
     "solo_wins": 10,
     "duo_wins": 15,
     "squad_wins": 6,
-    "battle_pass_level": 155,
+    "battle_pass_level": 161,
     "br_rank": "Unranked",
     "reload_rank": "Unranked"
   },
