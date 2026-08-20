@@ -72,9 +72,9 @@
     "reload_rank": "Unranked"
   },
   "player_2_fn": {
-    "wins": 499,
-    "kills": 23600,
-    "matches": 13938,
+    "wins": 500,
+    "kills": 23605,
+    "matches": 13939,
     "kd": 1.76,
     "solo_wins": 50,
     "duo_wins": 154,
@@ -84,9 +84,9 @@
     "reload_rank": "Unranked"
   },
   "player_3_fn": {
-    "wins": 266,
-    "kills": 12514,
-    "matches": 5061,
+    "wins": 267,
+    "kills": 12519,
+    "matches": 5062,
     "kd": 2.61,
     "solo_wins": 11,
     "duo_wins": 41,
