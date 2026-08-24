@@ -1,10 +1,10 @@
 {
   "player_1_r6": {
-    "ranked_kills": 192,
-    "ranked_deaths": 118,
-    "ranked_wins": 22,
-    "ranked_kd": 1.63,
-    "rank_points": 2236,
+    "ranked_kills": 170,
+    "ranked_deaths": 106,
+    "ranked_wins": 21,
+    "ranked_kd": 1.6,
+    "rank_points": 2252,
     "ranked_rank": "Silver 3",
     "casual_kills": 2,
     "casual_deaths": 1,
@@ -12,12 +12,12 @@
     "casual_kd": 2.0,
     "casual_mmr": 0,
     "casual_rank": "Unranked",
-    "overall_kills": 221,
-    "overall_deaths": 138,
-    "overall_wins": 26,
-    "overall_kd": 1.6,
+    "overall_kills": 199,
+    "overall_deaths": 126,
+    "overall_wins": 25,
+    "overall_kd": 1.58,
     "level": 63,
-    "time_played_hours": 204
+    "time_played_hours": 0
   },
   "player_2_r6": {
     "ranked_kills": 99,
