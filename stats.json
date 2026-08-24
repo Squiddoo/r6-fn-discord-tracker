@@ -73,8 +73,8 @@
   },
   "player_2_fn": {
     "wins": 505,
-    "kills": 23738,
-    "matches": 13992,
+    "kills": 23740,
+    "matches": 13995,
     "kd": 1.76,
     "solo_wins": 50,
     "duo_wins": 154,
@@ -86,7 +86,7 @@
   "player_3_fn": {
     "wins": 275,
     "kills": 12728,
-    "matches": 5140,
+    "matches": 5143,
     "kd": 2.62,
     "solo_wins": 11,
     "duo_wins": 41,
