@@ -11,7 +11,7 @@ from siegeapi import Auth
 from tracker.arenyze import fetch_r6_player_arenyze
 from tracker.compare import diff_stats, is_uninitialized
 from tracker.config import load_settings
-from tracker.discord_webhook import build_embed, refresh_game_embeds, send_embed
+from tracker.discord_webhook import build_embed, refresh_game_embeds, send_embeds
 from tracker.fortnite import fetch_fn_player
 from tracker.r6 import PLAYER_GAP_SECONDS, connect_with_backoff, fetch_r6_player
 from tracker.schema import empty_snapshot, labels_for
@@ -33,28 +33,38 @@ def _safe_failure(player_key: str, exc: BaseException) -> str:
     return f"{player_key}: {type(exc).__name__}: {text[:300]}"
 
 
-async def _send_preview(
+async def _send_game_previews(
     webhook_url: str,
     game: str,
-    display_name: str,
-    new_stats: dict,
-    player_key: str,
-) -> None:
-    changes = diff_stats(empty_snapshot()[player_key], new_stats, labels_for(player_key))
-    if not changes:
-        print(f"No preview fields for {player_key}; skipping that embed.")
-        return
-    await send_embed(
-        webhook_url,
-        build_embed(
-            game=game,
-            display_name=display_name,
-            changes=changes,
-            stats=new_stats,
-            preview=True,
-        ),
-    )
-    print(f"Sent one-time {game} preview embed for {player_key}.")
+    player_keys: list[str],
+    display_names: dict[str, str],
+    snapshot: dict,
+) -> int:
+    embeds = []
+    for player_key in player_keys:
+        changes = diff_stats(
+            empty_snapshot()[player_key],
+            snapshot[player_key],
+            labels_for(player_key),
+        )
+        if not changes:
+            print(f"No preview fields for {player_key}; skipping that embed.")
+            continue
+        embeds.append(
+            build_embed(
+                game=game,
+                display_name=display_names[player_key],
+                changes=changes,
+                stats=snapshot[player_key],
+                preview=True,
+            )
+        )
+    if not embeds:
+        print(f"No preview embeds for {game}; skipping.")
+        return 0
+    await send_embeds(webhook_url, embeds)
+    print(f"Sent one-time {game} preview ({len(embeds)} player embed(s)).")
+    return len(embeds)
 
 
 async def run(*, preview_once: bool = False, preview_only: str = "both") -> int:
@@ -152,26 +162,30 @@ async def run(*, preview_once: bool = False, preview_only: str = "both") -> int:
         send_r6 = preview_only in {"r6", "both"}
         send_fn = preview_only in {"fn", "both"}
         if send_r6 and r6_ok:
-            key = r6_ok[0]
-            await _send_preview(
-                settings.webhook_url,
-                "r6",
-                display_names[key],
-                snapshot[key],
-                key,
-            )
-            notified += 1
+            try:
+                notified += await _send_game_previews(
+                    settings.webhook_url,
+                    "r6",
+                    r6_ok,
+                    display_names,
+                    snapshot,
+                )
+            except Exception as exc:
+                failures.append(_safe_failure("discord_preview_r6", exc))
+                print(f"::warning::{failures[-1]}")
             await asyncio.sleep(1)
         if send_fn and fn_ok:
-            key = fn_ok[0]
-            await _send_preview(
-                settings.webhook_url,
-                "fn",
-                display_names[key],
-                snapshot[key],
-                key,
-            )
-            notified += 1
+            try:
+                notified += await _send_game_previews(
+                    settings.webhook_url,
+                    "fn",
+                    fn_ok,
+                    display_names,
+                    snapshot,
+                )
+            except Exception as exc:
+                failures.append(_safe_failure("discord_preview_fn", exc))
+                print(f"::warning::{failures[-1]}")
         print("Preview sent; saving overwrite-only baseline without 0->real spam.")
     else:
         message_ids = load_message_ids(MESSAGES_PATH)
@@ -238,7 +252,7 @@ def main() -> None:
         "--preview-once",
         action="store_true",
         help=(
-            "Send one Siege and one Fortnite example embed after a successful live fetch, "
+            "Send a one-time Discord preview of current stats for every fetched player, "
             "then save the baseline without 0->real spam."
         ),
     )
@@ -246,7 +260,7 @@ def main() -> None:
         "--preview-only",
         choices=("r6", "fn", "both"),
         default="both",
-        help="With --preview-once, which example embed(s) to send.",
+        help="With --preview-once, which game(s) to send.",
     )
     args = parser.parse_args()
     raise SystemExit(
