@@ -61,8 +61,8 @@
   },
   "player_1_fn": {
     "wins": 248,
-    "kills": 8672,
-    "matches": 1981,
+    "kills": 8673,
+    "matches": 1982,
     "kd": 5.0,
     "solo_wins": 10,
     "duo_wins": 19,
@@ -85,9 +85,9 @@
   },
   "player_3_fn": {
     "wins": 294,
-    "kills": 13549,
-    "matches": 5435,
-    "kd": 2.63,
+    "kills": 13552,
+    "matches": 5436,
+    "kd": 2.64,
     "solo_wins": 11,
     "duo_wins": 44,
     "squad_wins": 41,
