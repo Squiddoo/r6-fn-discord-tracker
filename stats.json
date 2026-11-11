@@ -61,9 +61,9 @@
   },
   "player_1_fn": {
     "wins": 251,
-    "kills": 8715,
-    "matches": 1992,
-    "kd": 5.01,
+    "kills": 8717,
+    "matches": 1993,
+    "kd": 5.0,
     "solo_wins": 10,
     "duo_wins": 19,
     "squad_wins": 16,
@@ -73,8 +73,8 @@
   },
   "player_2_fn": {
     "wins": 523,
-    "kills": 24145,
-    "matches": 14198,
+    "kills": 24148,
+    "matches": 14199,
     "kd": 1.77,
     "solo_wins": 50,
     "duo_wins": 162,
@@ -85,13 +85,13 @@
   },
   "player_3_fn": {
     "wins": 304,
-    "kills": 13704,
-    "matches": 5493,
+    "kills": 13708,
+    "matches": 5494,
     "kd": 2.64,
     "solo_wins": 11,
     "duo_wins": 53,
     "squad_wins": 42,
-    "battle_pass_level": 79,
+    "battle_pass_level": 80,
     "br_rank": "BRONZE I (0%)",
     "reload_rank": "SILVER II (0%)"
   }
